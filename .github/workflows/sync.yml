@@ -1,4 +1,12 @@
-- name: Pull and Push
+name: Sync to Aliyun
+on: [push]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Login to Aliyun
+        run: docker login --username=${{ secrets.ALI_USERNAME }} --password=${{ secrets.ALI_PASSWORD }} ${{ secrets.ALI_REGISTRY }}
+      - name: Pull and Push
         run: |
           # 1. 拉取（GitHub 缓存会加速这一步）
           docker pull nvcr.io/nvidia/pytorch:25.01-py3
