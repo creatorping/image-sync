@@ -1,16 +1,12 @@
-name: Sync to Aliyun
-on: [push]
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Login to Aliyun
-        run: docker login --username=${{ secrets.ALI_USERNAME }} --password=${{ secrets.ALI_PASSWORD }} ${{ secrets.ALI_REGISTRY }}
-      - name: Pull and Push
+- name: Pull and Push
         run: |
-          # 拉取支持 sm_120 的官方镜像
+          # 1. 拉取（GitHub 缓存会加速这一步）
           docker pull nvcr.io/nvidia/pytorch:25.01-py3
-          # 打标签为你的阿里云仓库地址 (请替换 [命名空间] 为你刚才创的名字)
+          
+          # 2. 检查变量拼接，确保 ${{ secrets.ALI_REGISTRY }} 结尾没有斜杠
+          # 如果你的 ALI_REGISTRY 填的是 "registry.cn-hangzhou.aliyuncs.com"
+          # 这里的拼接结果将是 "registry.cn-hangzhou.aliyuncs.com/my_english/pytorch-5090:25.01"
           docker tag nvcr.io/nvidia/pytorch:25.01-py3 ${{ secrets.ALI_REGISTRY }}/my_english/pytorch-5090:25.01
-          # 推送到国内
+          
+          # 3. 推送到国内
           docker push ${{ secrets.ALI_REGISTRY }}/my_english/pytorch-5090:25.01
