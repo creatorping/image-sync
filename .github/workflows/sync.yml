@@ -5,19 +5,23 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Login to Aliyun
+      - name: Free Disk Space
         run: |
-          # 1. 建议直接在这里写死你的阿里云登录名（例如手机号或邮箱）
-          # 2. 确保 secrets.ALI_PASSWORD 已经在 GitHub Secrets 中设置好
-          echo "${{ secrets.ALI_PASSWORD }}" | docker login --username="你的阿里云登录名" --password-stdin registry.cn-hangzhou.aliyuncs.com
+          sudo rm -rf /usr/share/dotnet /opt/ghc "/usr/local/share/boost"
+          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+
+      - name: Login to Aliyun
+        # 重点：统一使用你的专属个人实例域名
+        run: |
+          echo "${{ secrets.ALI_PASSWORD }}" | docker login --username="${{ secrets.ALI_USERNAME }}" --password-stdin crpi-ut0apwr713irl7gy.cn-hangzhou.personal.cr.aliyuncs.com
 
       - name: Pull and Push
         run: |
-          # 拉取 (GitHub 缓存会使这步很快)
+          # 1. 拉取支持 RTX 5090 D (sm_120) 的 NVIDIA 官方镜像
           docker pull nvcr.io/nvidia/pytorch:25.01-py3
           
-          # 打标签 (确保 my_english 空间已创建)
-          docker tag nvcr.io/nvidia/pytorch:25.01-py3 registry.cn-hangzhou.aliyuncs.com/my_english/pytorch-5090:25.01
+          # 2. 打标签：统一使用专属域名
+          docker tag nvcr.io/nvidia/pytorch:25.01-py3 crpi-ut0apwr713irl7gy.cn-hangzhou.personal.cr.aliyuncs.com/my_english/pytorch-5090:25.01
           
-          # 推送
-          docker push crpi-ut0apwr713irl7gy.cn-hangzhou.personal.cr.aliyuncs.com/my_english/pytorch-5090:last
+          # 3. 推送
+          docker push crpi-ut0apwr713irl7gy.cn-hangzhou.personal.cr.aliyuncs.com/my_english/pytorch-5090:25.01
