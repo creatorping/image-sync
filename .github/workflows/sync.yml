@@ -7,14 +7,17 @@ jobs:
     steps:
       - name: Login to Aliyun
         run: |
-          # 1. 这里直接把账户名写进去（例如 13800138000）
-          # 2. 这里的密码写死你刚才在阿里云设的那个【固定密码】
-          # 3. 如果成功了，下次再改回 secrets 保护。如果这都 403，那就是阿里云账号的问题。
-          echo "28457834BBBksi" | docker login --username="最朦胧的梦" --password-stdin registry.cn-hangzhou.aliyuncs.com
+          # 1. 建议直接在这里写死你的阿里云登录名（例如手机号或邮箱）
+          # 2. 确保 secrets.ALI_PASSWORD 已经在 GitHub Secrets 中设置好
+          echo "${{ secrets.ALI_PASSWORD }}" | docker login --username="你的阿里云登录名" --password-stdin registry.cn-hangzhou.aliyuncs.com
 
       - name: Pull and Push
         run: |
-          # 之前的 Pull 已经成功了，现在只要冲破 Push
+          # 拉取 (GitHub 缓存会使这步很快)
           docker pull nvcr.io/nvidia/pytorch:25.01-py3
+          
+          # 打标签 (确保 my_english 空间已创建)
           docker tag nvcr.io/nvidia/pytorch:25.01-py3 registry.cn-hangzhou.aliyuncs.com/my_english/pytorch-5090:25.01
-          docker push registry.cn-hangzhou.aliyuncs.com/my_english/pytorch-5090:25.01
+          
+          # 推送
+          docker push crpi-ut0apwr713irl7gy.cn-hangzhou.personal.cr.aliyuncs.com/my_english/pytorch-5090:last
