@@ -8,13 +8,12 @@ jobs:
         run: docker login --username=${{ secrets.ALI_USERNAME }} --password=${{ secrets.ALI_PASSWORD }} ${{ secrets.ALI_REGISTRY }}
       - name: Pull and Push
         run: |
-          # 1. 拉取（GitHub 缓存会加速这一步）
+          # 1. 拉取 (这步之前已经跑通了，由于缓存会非常快)
           docker pull nvcr.io/nvidia/pytorch:25.01-py3
           
-          # 2. 检查变量拼接，确保 ${{ secrets.ALI_REGISTRY }} 结尾没有斜杠
-          # 如果你的 ALI_REGISTRY 填的是 "registry.cn-hangzhou.aliyuncs.com"
-          # 这里的拼接结果将是 "registry.cn-hangzhou.aliyuncs.com/my_english/pytorch-5090:25.01"
-          docker tag nvcr.io/nvidia/pytorch:25.01-py3 ${{ secrets.ALI_REGISTRY }}/my_english/pytorch-5090:25.01
+          # 2. 修正打标签逻辑：直接使用完整路径，确保开头和中间没有多余斜杠
+          # 格式必须是：域名/命名空间/仓库名:标签
+          docker tag nvcr.io/nvidia/pytorch:25.01-py3 registry.cn-hangzhou.aliyuncs.com/my_english/pytorch-5090:25.01
           
-          # 3. 推送到国内
-          docker push ${{ secrets.ALI_REGISTRY }}/my_english/pytorch-5090:25.01
+          # 3. 执行推送
+          docker push registry.cn-hangzhou.aliyuncs.com/my_english/pytorch-5090:25.01
