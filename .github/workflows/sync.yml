@@ -11,6 +11,6 @@ jobs:
           # 拉取支持 sm_120 的官方镜像
           docker pull nvcr.io/nvidia/pytorch:25.01-py3
           # 打标签为你的阿里云仓库地址 (请替换 [命名空间] 为你刚才创的名字)
-          docker tag nvcr.io/nvidia/pytorch:25.01-py3 ${{ secrets.ALI_REGISTRY }}/[命名空间]/pytorch-5090:25.01
+          docker tag nvcr.io/nvidia/pytorch:25.01-py3 ${{ secrets.ALI_REGISTRY }}/my_english/pytorch-5090:25.01
           # 推送到国内
-          docker push ${{ secrets.ALI_REGISTRY }}/[命名空间]/pytorch-5090:25.01
+          docker push ${{ secrets.ALI_REGISTRY }}/my_english/pytorch-5090:25.01
