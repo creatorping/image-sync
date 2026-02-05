@@ -1,19 +1,22 @@
 name: Sync to Aliyun
 on: [push]
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Login and Push
+      - name: Login to Aliyun
+        # 使用 echo 配合 --password-stdin 强制非交互登录，解决 non TTY 错误
         run: |
-          # 使用账号和刚设置的【访问凭证固定密码】登录
-          docker login --username=${{ secrets.ALI_USERNAME }} --password=${{ secrets.ALI_PASSWORD }} registry.cn-hangzhou.aliyuncs.com
-          
-          # 拉取官方镜像
+          echo "${{ secrets.ALI_PASSWORD }}" | docker login --username=${{ secrets.ALI_USERNAME }} --password-stdin registry.cn-hangzhou.aliyuncs.com
+
+      - name: Pull and Push
+        run: |
+          # 1. 拉取支持 sm_120 的 NVIDIA 官方镜像
           docker pull nvcr.io/nvidia/pytorch:25.01-py3
           
-          # 打标签（请再次确认 my_english 是你在阿里云创建的命名空间）
+          # 2. 打标签：确保路径为 域名/命名空间/仓库名:标签
           docker tag nvcr.io/nvidia/pytorch:25.01-py3 registry.cn-hangzhou.aliyuncs.com/my_english/pytorch-5090:25.01
           
-          # 执行推送
+          # 3. 推送到阿里云私有仓库
           docker push registry.cn-hangzhou.aliyuncs.com/my_english/pytorch-5090:25.01
